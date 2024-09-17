@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Kartu - Player, Klasemen, dan Komentari</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+         .sidebar-right {
+            width: 20%;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .content-center {
+            width: 79%;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        button {
+            padding: 10px;
+            background-color: teal;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #007777;
+        }
+
+        .winner-icon {
+            font-size: 30px;
+        }
+        /* Styles for the commentary list */
+.commentary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.commentary-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.commentary-list li:last-child {
+    border-bottom: none;
+}
+
+.commentary-time {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.commentary-action {
+    font-weight: bold;
+    color: #333;
+}
+
+.commentary-card {
+    color: #007bff;
+}
+
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar-left, .sidebar-right, .content-center {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+        input{
+        color:black;
+        }
+        label{
+            color:white;
+            padding:8px;
+        }
+   
+    </style>
+</head>
+<body>
+
+
+
+    <!-- Konten Tengah -->
+    <div class="content-center">
+
+         <h3>Catat Hasil Pertandingan</h3>
+        <form id="recordMatchForm">
+            <label for="matchDate">Tanggal Pertandingan:</label>
+            <input type="date" id="matchDate" required>  
+                                 <div id="playerInputs" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    
+            </div>
+            <button type="submit"><i class="fas fa-check"></i> Catat Hasil</button>
+        </form>
+        <br>
+        <h3>Tambah Player</h3>
+        <form id="addPlayerForm">
+            <input type="text" id="playerName" placeholder="Nama Player" required>
+            <button type="submit"><i class="fas fa-user-plus"></i> Tambah Player</button>
+        </form>
+
+        <h3>Ubah Nama Player</h3>
+        <form id="editPlayerForm">
+            <label for="editPlayerSelect">Pilih Player:</label>
+            <select id="editPlayerSelect"></select>
+            <input type="text" id="newPlayerName" placeholder="Nama Baru" required>
+            <button type="submit"><i class="fas fa-edit"></i> Ubah Nama</button>
+        </form>
+
+    
+        <button id="resetData"><i class="fas fa-trash"></i> Reset Semua Data</button>
+        <br>
+        <h2>Komentari Permainan</h2>
+        <div id="commentarySection">
+            <form id="commentaryForm">
+                <label for="playerSelect">Pilih Player:</label>
+                <select id="playerSelect"></select>
+
+                <label for="selectedCard">Pilih Kartu:</label>
+                <select id="selectedCard">
+                    <option value="Sekop">Sekop</option>
+                    <option value="Hati">Hati</option>
+                    <option value="Wajik">Wajik</option>
+                    <option value="Keriting">Keriting</option>
+                </select>
+
+                <label for="cardAction">Tindakan Kartu:</label>
+                <select id="cardAction">
+                    <option value="ambil">Ambil</option>
+                    <option value="buang">Buang</option>
+                    <option value="susun">Susun</option>
+                </select>
+
+                <button type="submit"><i class="fas fa-comment-dots"></i> Tambah Komentar</button>
+            </form>
+
+            <ul id="commentaryList" class="commentary-list"></ul>
+        </div>
+        <br>
+        <h2>Daftar Player</h2>
+        <ul id="playerList"></ul>
+
+        
+    Konten Tengah <h2>Klasemen</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Points +</th>
+                    <th>Point - </th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="klasemenTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Sidebar Kanan -->
+    <div class="sidebar-right">
+        <h2>Pemenang</h2>
+        <div id="winner">
+            <i class="winner-icon fas fa-crown"></i>
+            <p id="winnerName">Belum ada pemenang</p>
+        </div>
+    </div>
+    <script>
+        class CardGame {
+            constructor() {
+                this.players = JSON.parse(localStorage.getItem('players')) || [];
+                this.matches = JSON.parse(localStorage.getItem('matches')) || [];
+                this.commentary = JSON.parse(localStorage.getItem('commentary')) || [];
+                this.gameStarted = false;
+            }
+    
+            addPlayer(name) {
+                if (!this.gameStarted) {
+                    this.players.push({
+                        name: name,
+                        points: 0,
+                        plusPoints: 0,
+                        minusPoints: 0,
+                        cards: []
+                    });
+                    this.saveToLocalStorage();
+                    this.displayPlayers();
+                    this.generatePlayerInputs();
+                    this.generateEditPlayerSelect();
+                    this.generateCommentaryPlayerSelect();
+                } else {
+                    alert('Permainan sudah dimulai, tidak bisa menambah player baru.');
+                }
+            }
+    
+            editPlayer(oldName, newName) {
+                let player = this.players.find(p => p.name === oldName);
+                if (player) {
+                    player.name = newName;
+                    this.saveToLocalStorage();
+                    this.displayPlayers();
+                    this.generatePlayerInputs();
+                    this.generateEditPlayerSelect();
+                    this.generateCommentaryPlayerSelect();
+                }
+            }
+    
+            recordMatch(date, playerResults) {
+                if (!this.gameStarted) this.gameStarted = true;
+    
+                // Use today's date if no date is provided
+                let matchDate = date || new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    
+                let match = {
+                    date: matchDate,
+                    results: []
+                };
+    
+                playerResults.forEach(result => {
+                    let player = this.players.find(p => p.name === result.name);
+                    if (player) {
+                        player.plusPoints += result.plusPoints;
+                        player.minusPoints += result.minusPoints;
+                        player.points = player.plusPoints - player.minusPoints;
+    
+                        match.results.push({
+                            name: result.name,
+                            plusPoints: result.plusPoints,
+                            minusPoints: result.minusPoints,
+                            totalPoints: player.points
+                        });
+    
+                        if (player.points >= 1000) {
+                            document.getElementById('winnerName').textContent = `${player.name} mencapai 1000 poin!`;
+                            this.saveDailyResultsAsJson();
+                            this.endGame();
+                        }
+                    }
+                });
+                
+    
+                this.matches.push(match);
+                this.saveToLocalStorage();
+                this.displayKlasemen();
+                this.displayCommentary();
+            }
+    
+            displayWinner() {
+            let winner = this.players.find(p => p.points >= 1000);
+            let winnerName = document.getElementById('winnerName');
+            if (winner) {
+                winnerName.textContent = `${winner.name} mencapai 1000 poin!`;
+
+                // Simpan pemenang ke localStorage jika belum tersimpan
+                if (!this.winner) {
+                    this.winner = winner.name;
+                    localStorage.setItem('winner', JSON.stringify(this.winner));
+                }
+            } else {
+                // Jika belum ada pemenang, tampilkan pesan default
+                winnerName.textContent = this.winner ? `${this.winner} adalah pemenang sebelumnya.` : 'Belum ada pemenang.';
+            }
+        }
+            addCommentary(playerName, card, action) {
+                let commentary = {
+                    playerName: playerName,
+                    card: card,
+                    action: action,
+                    timestamp: new Date().toISOString() // Add timestamp
+                };
+                this.commentary.push(commentary);
+                this.saveToLocalStorage();
+                this.displayCommentary();
+            }
+    
+            displayPlayers() {
+                let playerList = document.getElementById('playerList');
+                playerList.innerHTML = '';
+                this.players.forEach(player => {
+                    let li = document.createElement('li');
+                    li.textContent = `${player.name} - Points: ${player.points}`;
+                    playerList.appendChild(li);
+                });
+            }
+    
+            displayKlasemen() {
+                let klasemenTable = document.getElementById('klasemenTable');
+                klasemenTable.innerHTML = '';
+                this.players.sort((a, b) => b.points - a.points).forEach(player => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${player.name}</td>
+                        <td>${player.plusPoints}</td>
+                        <td>${player.minusPoints}</td>
+                        <td>${player.points}</td>
+                    `;
+                    klasemenTable.appendChild(tr);
+                });
+            }
+    
+            displayCommentary() {
+                let commentaryList = document.getElementById('commentaryList');
+                commentaryList.innerHTML = '';
+    
+                // Sort commentary by timestamp (latest first)
+                this.commentary.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+                this.commentary.forEach(comm => {
+                    let li = document.createElement('li');
+                    li.textContent = `${comm.timestamp} - ${comm.playerName} ${comm.action} kartu ${comm.card}`;
+                    commentaryList.appendChild(li);
+                });
+            }
+    
+            saveToLocalStorage() {
+                localStorage.setItem('players', JSON.stringify(this.players));
+                localStorage.setItem('matches', JSON.stringify(this.matches));
+                
+                localStorage.setItem('commentary', JSON.stringify(this.commentary));
+            }
+    
+            saveDailyResultsAsJson() {
+                let matchData = {
+                    date: new Date().toLocaleDateString(),
+                    matches: this.matches
+                };
+    
+                let jsonString = JSON.stringify(matchData);
+                let blob = new Blob([jsonString], { type: 'application/json' });
+                let url = URL.createObjectURL(blob);
+    
+                let downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = `match_results_${new Date().toLocaleDateString()}.json`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }
+    
+            endGame() {
+                this.players = [];
+                this.matches = [];
+                this.commentary = [];
+                this.gameStarted = false;
+                this.saveToLocalStorage();
+                this.displayPlayers();
+                this.displayKlasemen();
+                this.displayCommentary();
+            }
+    
+            resetData() {
+                if (confirm('Apakah Anda yakin ingin mereset semua data?')) {
+                    localStorage.clear();
+                    this.players = [];
+                    this.matches = [];
+                    this.commentary = [];
+                    this.gameStarted = false;
+                    this.displayPlayers();
+                    this.displayKlasemen();
+                    this.displayCommentary();
+                }
+            }
+    
+            init() {
+                this.displayPlayers();
+                this.displayKlasemen();
+                this.displayCommentary();
+                this.generatePlayerInputs();
+                this.generateEditPlayerSelect();
+                this.generateCommentaryPlayerSelect();
+            }
+    
+            generatePlayerInputs() {
+                let playerInputs = document.getElementById('playerInputs');
+                playerInputs.innerHTML = '';
+                this.players.forEach(player => {
+                    let playerInput = `
+                        <div  style="background:teal; " class="text-center  p-4 rounded-lg shadow-lg border  hover:bg-black-600 transition-colors duration-300">
+                         <label style="display: list-item;" for="plusPoints-${player.name}">Points untuk ${player.name}:</label>
+                            <input  style=" width: 30%; display: inline;" type="number" id="plusPoints-${player.name}" placeholder="Plus" required>
+                            <input  style=" width: 30%; display: inline;" type="number" id="minusPoints-${player.name}" placeholder="Minus" required>
+                        </div>
+                    `;
+                    playerInputs.innerHTML += playerInput;
+                });
+            }
+    
+            generateEditPlayerSelect() {
+                let editPlayerSelect = document.getElementById('editPlayerSelect');
+                editPlayerSelect.innerHTML = '';
+                this.players.forEach(player => {
+                    let option = document.createElement('option');
+                    option.value = player.name;
+                    option.textContent = player.name;
+                    editPlayerSelect.appendChild(option);
+                });
+            }
+    
+            generateCommentaryPlayerSelect() {
+                let playerSelect = document.getElementById('playerSelect');
+                playerSelect.innerHTML = '';
+                this.players.forEach(player => {
+                    let option = document.createElement('option');
+                    option.value = player.name;
+                    option.textContent = player.name;
+                    playerSelect.appendChild(option);
+                });
+            }
+        }
+    
+        let game = new CardGame();
+        game.init();
+    
+        document.getElementById('addPlayerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let playerName = document.getElementById('playerName').value;
+            game.addPlayer(playerName);
+            document.getElementById('playerName').value = ''; 
+        });
+    
+        document.getElementById('editPlayerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let oldName = document.getElementById('editPlayerSelect').value;
+            let newName = document.getElementById('newPlayerName').value;
+            game.editPlayer(oldName, newName);
+            document.getElementById('newPlayerName').value = ''; 
+        });
+    
+        document.getElementById('recordMatchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let matchDate = document.getElementById('matchDate').value;
+            let playerResults = [];
+    
+            game.players.forEach(player => {
+                let plusPoints = document.getElementById(`plusPoints-${player.name}`).value;
+                let minusPoints = document.getElementById(`minusPoints-${player.name}`).value;
+                playerResults.push({
+                    name: player.name,
+                    plusPoints: parseInt(plusPoints),
+                    minusPoints: parseInt(minusPoints)
+                });
+            });
+    
+            game.recordMatch(matchDate, playerResults);
+            document.getElementById('matchDate').value = ''; 
+        });
+    
+        document.getElementById('commentaryForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let playerName = document.getElementById('playerSelect').value;
+            let selectedCard = document.getElementById('selectedCard').value;
+            let action = document.getElementById('cardAction').value;
+            game.addCommentary(playerName, selectedCard, action);
+        });
+    
+        document.getElementById('resetData').addEventListener('click', function() {
+            game.resetData();
+        });
+    
+    </script>
+    
+  
+
+</body>
+</html>
